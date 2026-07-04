@@ -23,7 +23,34 @@ module Rubycam
       LIBC['munmap'], [Fiddle::TYPE_VOIDP, Fiddle::TYPE_SIZE_T], Fiddle::TYPE_INT
     )
 
-    attr_reader :path, :driver, :card, :width, :height, :pixel_format
+    CAP_META_CAPTURE = 0x00800000
+
+    attr_reader :path, :driver, :card, :bus_info, :device_caps,
+                :width, :height, :pixel_format
+
+    # Find a camera by device path, /dev name, or a substring of its card
+    # name or bus info — e.g. Device.find('OBSBOT Tiny 2'). Metadata-only
+    # nodes (uvcvideo exposes one per camera) are skipped. Returns nil when
+    # nothing matches.
+    def self.find(hint)
+      [hint, "/dev/#{hint}"].each do |path|
+        return open(path) if File.exist?(path)
+      end
+
+      Dir['/dev/video*'].sort.each do |path|
+        device = begin
+          open(path)
+        rescue SystemCallError
+          next
+        end
+        if (device.card.include?(hint) || device.bus_info.include?(hint)) &&
+           device.device_caps & CAP_META_CAPTURE == 0
+          return device
+        end
+        device.close
+      end
+      nil
+    end
 
     def self.open(path = '/dev/video0')
       device = new(path)
@@ -169,6 +196,8 @@ module Rubycam
       @io.ioctl(Ioctl::VIDIOC_QUERYCAP, buf)
       @driver = buf[0, 16].unpack1('Z16')
       @card = buf[16, 32].unpack1('Z32')
+      @bus_info = buf[48, 32].unpack1('Z32')
+      @device_caps = buf[88, 4].unpack1('L')
     end
 
     def enumerate_controls

@@ -24,16 +24,29 @@ Rubycam::Device.open('/dev/video0') do |cam|
 end
 ```
 
-OBSBOT vendor commands (sleep/wake, status) go through the camera's UVC
-extension unit — the same channel the official OBSBOT software uses
-(protocol from the [Tiny4Linux](https://github.com/OpenFoxes/Tiny4Linux)
-project):
+OBSBOT vendor commands go through the camera's UVC extension unit — the
+same channel the official OBSBOT software uses (protocol from the
+[Tiny4Linux](https://github.com/OpenFoxes/Tiny4Linux) project; see
+`TINY4LINUX_FEATURES.md` for the full feature map):
 
 ```ruby
+cam = Rubycam::Device.find('OBSBOT Tiny 2')  # path, /dev name or card/bus hint
 bot = Rubycam::Obsbot.new(cam)
-bot.status   # => { asleep: false, hdr: true, ai_mode: :no_tracking }
+bot.status   # => { asleep: false, hdr: true, ai_mode: :no_tracking,
+             #      tracking_speed: :standard }
 bot.sleep!   # privacy sleep (gimbal folds down)
 bot.wake!    # wakes even after the camera was folded down by hand
+
+bot.ai_mode = :normal_tracking  # :no_tracking :upper_body :close_up :headless
+                                # :lower_body :desk_mode :whiteboard :hand :group
+bot.tracking_speed = :sport     # or :standard
+bot.goto_preset(0)              # stored gimbal positions 0..2
+bot.hdr = true
+bot.exposure_mode = :face       # :manual, :global or :face
+
+bot.debug = true                # log raw traffic to stderr
+bot.send_hex('16 02 00 00')     # raw command to the extension unit
+bot.dump                        # current status block as hex
 ```
 
 Notes:
@@ -44,17 +57,25 @@ Notes:
 - Writing `tilt_absolute` to its minimum does NOT trigger privacy sleep —
   that gesture is hardware-only.
 - The first frame after STREAMON takes a few seconds (ISP startup).
+- On newer Tiny 2 firmware the status block lags mode changes by seconds
+  and reports tracking speed at byte 0x24 instead of 0x21 (both handled).
 
 ## Viewer app
 
 ```sh
 nix develop            # or let direnv do it (.envrc: use flake)
 bundle install
-bundle exec ruby app/camera_app.rb
+bin/rubycam            # or just `rubycam` with direnv (bin/ is on PATH)
+
+bin/rubycam /dev/video2        # explicit device
+bin/rubycam 'OBSBOT Tiny 2'    # find by name
 ```
 
-Live preview, sliders for gimbal/zoom/image controls, a power switch
-(parks the gimbal in privacy sleep) and reset-to-defaults.
+Live preview, sliders for gimbal/zoom/image controls, and an OBSBOT panel
+with power switch, live status, AI tracking modes, tracking speed, preset
+positions, HDR, exposure modes and a raw-hex debug console. The ⤢ button
+toggles a compact widget mode (panel only); if the camera disappears the
+app keeps polling and reconnects when it returns.
 
 ## Examples
 
