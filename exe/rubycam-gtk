@@ -9,6 +9,28 @@
 #
 #   rubycam-gtk --obsbot         # full OBSBOT panel (default)
 #   rubycam-gtk --v4l2           # generic V4L2 viewer, no OBSBOT features
+USAGE = <<~TEXT
+  Usage: rubycam-gtk [options] [device]
+
+    device                Device path, /dev name, or card/bus-name substring
+                          (default: /dev/video0)
+
+  Options:
+    --obsbot              Full OBSBOT panel (default)
+    --v4l2                Generic V4L2 viewer, no OBSBOT features
+    -h, --help            Show this message
+
+  Examples:
+    rubycam-gtk                  # OBSBOT viewer, first camera at /dev/video0
+    rubycam-gtk /dev/video2      # explicit device node
+    rubycam-gtk 'OBSBOT Tiny 2'  # find by card/bus name
+TEXT
+
+if ARGV.include?("--help") || ARGV.include?("-h")
+  puts USAGE
+  exit
+end
+
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "rubycam/gtk"
 
