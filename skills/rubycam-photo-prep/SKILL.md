@@ -108,6 +108,10 @@ magick identify -format '%[fx:mean]' shot.jpg
   original exists to be delivered, not to be Read; if you need more detail
   than 960px shows, crop a region (still downsized in bytes) rather than
   opening the whole frame.
+- **Better: don't look at every probe shot at all.** If Ollama is installed
+  (or the user opts in), the `rubycam-vision` skill's Moondream triage
+  answers "anything in frame yet?" for free on intermediate frames, saving
+  your image reads for keepers.
 - **Fix the camera, not just the file.** If every capture needs heavy rescue,
   the exposure controls are wrong — say so and adjust them via the `rubycam`
   skill rather than silently brightening forever.

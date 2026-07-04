@@ -106,6 +106,11 @@ can't move and you should say so rather than trying.
 
 ### Centering a subject from a snapshot (verified on the Tiny 2)
 
+Prefer measuring over estimating: the **`rubycam-vision`** skill's
+`find_subject.py` detects the face in a snapshot and prints these pan/tilt
+deltas ready to apply. The rules below are for when you eyeball it (or the
+detector finds nothing):
+
 The frame behaves like a **mirror** horizontally: a subject on the *left* of
 the image is centered by *increasing* `pan_absolute` (and image-right →
 decrease). Vertical is not mirrored: subject low in frame → decrease
