@@ -39,8 +39,10 @@
 
           shellHook = ''
             export GEM_HOME="$HOME/.gem-${ruby.version}"
-            export GEM_PATH="$GEM_HOME"
-            export PATH="$GEM_HOME/bin:$PATH"
+            # BUNDLE_PATH installs go under ruby/<api-version>; include that
+            # gem home so the exe scripts work without `bundle exec`.
+            export GEM_PATH="$GEM_HOME/ruby/${ruby.version.libDir}:$GEM_HOME"
+            export PATH="$GEM_HOME/bin:$GEM_HOME/ruby/${ruby.version.libDir}/bin:$PATH"
             export BUNDLE_GEMFILE="$PWD/Gemfile"
             export BUNDLE_PATH="$GEM_HOME"
             export BUNDLE_BIN="$GEM_HOME/bin"
