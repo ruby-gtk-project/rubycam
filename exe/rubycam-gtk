@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+#
+# Launch the Rubycam GTK viewer.
+#
+#   rubycam-gtk                  # first camera at /dev/video0
+#   rubycam-gtk /dev/video2      # explicit device node
+#   rubycam-gtk 'OBSBOT Tiny 2'  # find by card/bus name
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+require "rubycam/gtk"
+
+Rubycam::GTK::CameraApp.new(ARGV.fetch(0, "/dev/video0")).build.run

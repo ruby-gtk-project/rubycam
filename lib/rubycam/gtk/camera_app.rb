@@ -1,13 +1,15 @@
-#!/usr/bin/env ruby
 # Live OBSBOT viewer: video preview, gimbal/zoom/image sliders, plus the
 # full Tiny4Linux control set (tracking, presets, speed, HDR, exposure,
-# debug console) in the OBSBOT panel.
-# Run inside the dev shell: bundle exec ruby app/camera_app.rb [device]
+# debug console) in the OBSBOT panel. Launched by exe/rubycam-gtk.
 require 'gtk4'
-require_relative '../lib/rubycam'
+require 'rubycam'
 require_relative 'obsbot_panel'
 
-class CameraApp
+module Rubycam
+  module GTK; end
+end
+
+class Rubycam::GTK::CameraApp
   FRAME_INTERVAL_MS = 16
   SLIDER_KEYS = %i[pan_absolute tilt_absolute zoom_absolute
                    brightness contrast saturation sharpness].freeze
@@ -78,7 +80,7 @@ class CameraApp
   def layout = @layout ||= Gtk::Box.new(:horizontal, 12)
 
   def panel
-    @panel ||= ObsbotPanel.new(bot: -> { obsbot },
+    @panel ||= Rubycam::GTK::ObsbotPanel.new(bot: -> { obsbot },
                                on_wake: -> { wake_camera },
                                on_sleep: -> { sleep_camera },
                                on_compact_toggle: -> { toggle_compact })
@@ -287,5 +289,3 @@ class CameraApp
     nil # drop corrupt frames rather than crashing the pump
   end
 end
-
-CameraApp.new(ARGV.fetch(0, '/dev/video0')).build.run

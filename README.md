@@ -65,10 +65,10 @@ Notes:
 ```sh
 nix develop            # or let direnv do it (.envrc: use flake)
 bundle install
-bin/rubycam            # or just `rubycam` with direnv (bin/ is on PATH)
+bin/rubycam-gtk        # or just `rubycam-gtk` with direnv (bin/ is on PATH)
 
-bin/rubycam /dev/video2        # explicit device
-bin/rubycam 'OBSBOT Tiny 2'    # find by name
+bin/rubycam-gtk /dev/video2        # explicit device
+bin/rubycam-gtk 'OBSBOT Tiny 2'    # find by name
 ```
 
 Live preview, sliders for gimbal/zoom/image controls, and an OBSBOT panel
@@ -83,23 +83,23 @@ Everything the OBSBOT panel does, scriptable (needs only Ruby + the
 `dry-cli` gem, no GTK):
 
 ```sh
-bin/rubycamctl                      # list commands
-bin/rubycamctl status               # sleep state, AI mode, speed, HDR
-bin/rubycamctl wake                 # wake from privacy sleep
-bin/rubycamctl track upper_body     # AI tracking mode
-bin/rubycamctl speed sport
-bin/rubycamctl preset 2             # gimbal preset 1-3
-bin/rubycamctl hdr off
-bin/rubycamctl exposure face
+bin/rubycam                      # list commands
+bin/rubycam status               # sleep state, AI mode, speed, HDR
+bin/rubycam wake                 # wake from privacy sleep
+bin/rubycam track upper_body     # AI tracking mode
+bin/rubycam speed sport
+bin/rubycam preset 2             # gimbal preset 1-3
+bin/rubycam hdr off
+bin/rubycam exposure face
 
-bin/rubycamctl devices              # every /dev/video* node
-bin/rubycamctl controls             # V4L2 controls with ranges
-bin/rubycamctl set zoom_absolute 50
-bin/rubycamctl reset                # all controls back to defaults
-bin/rubycamctl snapshot shot.jpg --width=3840 --height=2160
+bin/rubycam devices              # every /dev/video* node
+bin/rubycam controls             # V4L2 controls with ranges
+bin/rubycam set zoom_absolute 50
+bin/rubycam reset                # all controls back to defaults
+bin/rubycam snapshot shot.jpg --width=3840 --height=2160
 
-bin/rubycamctl xu dump              # debug: status block as hex
-bin/rubycamctl xu send '16 02 02 00' --selector=0x06
+bin/rubycam xu dump              # debug: status block as hex
+bin/rubycam xu send '16 02 02 00' --selector=0x06
 ```
 
 Generic V4L2 commands default to `/dev/video0`; OBSBOT commands find the

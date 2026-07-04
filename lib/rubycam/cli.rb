@@ -2,7 +2,7 @@ require 'dry/cli'
 require_relative '../rubycam'
 
 module Rubycam
-  # Command-line companion to the GTK viewer (bin/rubycamctl). Generic V4L2
+  # Command-line companion to the GTK viewer (bin/rubycam). Generic V4L2
   # commands default to /dev/video0 like the GUI; OBSBOT vendor commands
   # default to finding the camera by name.
   module CLI
@@ -20,7 +20,7 @@ module Rubycam
         def with_device(options)
           hint = options.fetch(:device)
           device = Device.find(hint) or
-            abort "rubycamctl: no camera matches #{hint.inspect}"
+            abort "rubycam: no camera matches #{hint.inspect}"
           begin
             yield device
           ensure
@@ -30,13 +30,13 @@ module Rubycam
 
         def fetch_control(device, name)
           device.controls.fetch(name.to_sym) do
-            abort "rubycamctl: unknown control #{name} (see `controls`)"
+            abort "rubycam: unknown control #{name} (see `controls`)"
           end
         end
 
         def pick(value, allowed)
           allowed.find { |a| a.to_s == value } or
-            abort "rubycamctl: expected one of: #{allowed.join(', ')}"
+            abort "rubycam: expected one of: #{allowed.join(', ')}"
         end
       end
 
@@ -121,7 +121,7 @@ module Rubycam
             puts "#{ctrl.key} = #{ctrl.value}"
           end
         rescue ArgumentError
-          abort "rubycamctl: value must be an integer, got #{value.inspect}"
+          abort "rubycam: value must be an integer, got #{value.inspect}"
         end
       end
 
@@ -225,7 +225,7 @@ module Rubycam
 
         def call(number:, **options)
           n = Integer(number, exception: false)
-          abort 'rubycamctl: preset must be 1-3' unless n && (1..3).cover?(n)
+          abort 'rubycam: preset must be 1-3' unless n && (1..3).cover?(n)
           with_obsbot(options) do |bot|
             bot.ai_mode = :no_tracking
             bot.goto_preset(n - 1)

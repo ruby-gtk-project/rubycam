@@ -5,14 +5,13 @@
 #     cam.set_format(width: 1920, height: 1080, pixel_format: 'MJPG')
 #     File.binwrite('frame.jpg', cam.capture_frame)
 #   end
+require_relative 'rubycam/version'
 require_relative 'rubycam/ioctl'
 require_relative 'rubycam/controls'
 require_relative 'rubycam/device'
 require_relative 'rubycam/obsbot'
 
 module Rubycam
-  VERSION = '0.1.0'
-
   # All /dev/video* nodes that are actual capture devices.
   def self.devices
     Dir['/dev/video*'].sort.filter_map do |path|

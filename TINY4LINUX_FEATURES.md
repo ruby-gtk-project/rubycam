@@ -43,7 +43,7 @@ Boxes are checked as features land in Rubycam.
       hex-dump 0x06 / 0x02
 - [ ] i18n (7 locales) — skipped: English only, like the rest of Rubycam
 
-## CLI (`t4l` → `bin/rubycamctl`, dry-cli)
+## CLI (`t4l` → `bin/rubycam`, dry-cli)
 
 - [x] OBSBOT commands: status, wake/sleep, track, speed, preset, hdr, exposure
 - [x] Raw extension-unit access: `xu dump`, `xu send` (with `--debug` logging)

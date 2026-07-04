@@ -3,7 +3,11 @@
 # exposure modes and a raw-hex debug console. Talks to the camera through
 # the injected bot getter so a reconnect (new Obsbot) is picked up
 # transparently.
-class ObsbotPanel
+module Rubycam
+  module GTK; end
+end
+
+class Rubycam::GTK::ObsbotPanel
   AI_MODE_LABELS = { no_tracking: 'Static', normal_tracking: 'Normal',
                      close_up: 'Close-up', upper_body: 'Upper Body',
                      headless: 'Headless', lower_body: 'Lower Body',
