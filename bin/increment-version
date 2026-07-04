@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "erb"
+require_relative "../lib/rubycam/version"
+
+USAGE = <<~TEXT
+  Usage: bin/increment-version <major|minor|patch>
+
+  Bumps the shared Rubycam::VERSION used by both the rubycam and
+  rubycam-gtk gems (they are released in lockstep).
+TEXT
+
+segment = ARGV[0]
+
+unless %w[major minor patch].include?(segment)
+  warn USAGE
+  exit 1
+end
+
+current = Rubycam::VERSION
+major, minor, patch = current.split(".").map(&:to_i)
+
+case segment
+when "major" then major += 1; minor = 0; patch = 0
+when "minor" then minor += 1; patch = 0
+when "patch" then patch += 1
+end
+
+version = "#{major}.#{minor}.#{patch}"
+
+template_path = File.expand_path("../lib/rubycam/version.rb.erb", __dir__)
+output_path   = File.expand_path("../lib/rubycam/version.rb", __dir__)
+
+template = ERB.new(File.read(template_path))
+File.write(output_path, template.result(binding))
+
+puts "#{current} -> #{version}"

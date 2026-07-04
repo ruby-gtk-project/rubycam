@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../lib/rubycam/version"
+
+tag = "v#{Rubycam::VERSION}"
+
+unless `git tag -l #{tag}`.strip.empty?
+  abort "ERROR: Tag #{tag} already exists"
+end
+
+system("git tag #{tag}") || abort("ERROR: Failed to create tag #{tag}")
+
+puts "Tagged #{tag}"
+puts ""
+puts "To push the tag, run:"
+puts "  git push --tags"

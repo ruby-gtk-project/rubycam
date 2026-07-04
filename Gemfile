@@ -1,4 +1,7 @@
-source 'https://rubygems.org'
+# frozen_string_literal: true
 
-gem 'dry-cli'
-gem 'gtk4'
+source "https://rubygems.org"
+
+# Both gems live in this repo; develop them together.
+gemspec name: "rubycam"
+gemspec name: "rubycam-gtk"
