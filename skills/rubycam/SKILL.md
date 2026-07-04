@@ -74,10 +74,19 @@ is an OBSBOT concern handled in the companion skill or via `set auto_exposure`).
 | Set one control (clamped to range) | `set <control> <int>` |
 | Reset every writable control to default | `reset` |
 | Capture a JPEG still | `snapshot [path] [--width W] [--height H]` |
+| Nod the camera "yes" (gimbal tilt) | `yes` |
+| Shake the camera "no" (gimbal pan) | `no` |
 
 `set` clamps to the device's reported range, so an out-of-range value won't
 error — it silently lands at the nearest legal value. That's why you confirm
 afterward (see Working style).
+
+**Negative values need `--`.** dry-cli parses a leading dash as an option, so
+`set pan_absolute -104400` errors. Write:
+
+```sh
+rubycam set -- pan_absolute -104400
+```
 
 ## Aiming, zooming, framing
 
@@ -95,6 +104,27 @@ for the Tiny 2 but the CLI clamps to whatever the device reports.
 Not every webcam has pan/tilt/zoom — if `controls` doesn't list them, the camera
 can't move and you should say so rather than trying.
 
+### Centering a subject from a snapshot (verified on the Tiny 2)
+
+The frame behaves like a **mirror** horizontally: a subject on the *left* of
+the image is centered by *increasing* `pan_absolute` (and image-right →
+decrease). Vertical is not mirrored: subject low in frame → decrease
+`tilt_absolute` (negative tilts down). Don't reason it out from camera-eye
+geometry — that guess came out backwards in practice; trust this rule, take a
+shot, correct.
+
+Magnitude: at zoom 0 the horizontal field of view is ~80°, so a subject at
+the frame's edge is ~40° off axis. Estimate
+`degrees ≈ (pixel offset from center / half frame width) × 40`, then
+`set pan_absolute` in 3600-per-degree units.
+
+Large moves take a few seconds — the gimbal is a motor, not a register write.
+A snapshot fired immediately catches motion blur or the *old* framing. Take a
+throwaway snapshot first (it both burns the travel time and warms up the
+stream), then the shot you'll assess. If a subject "should be in frame but
+isn't" after a pan, check tilt before re-panning — being 30° too high looks
+identical to being 30° off sideways.
+
 ## Image quality
 
 Brightness, contrast, saturation, gain, sharpness, white balance and similar are
@@ -106,6 +136,31 @@ subject is backlit (`backlight_compensation`). For manual white balance, turn
 When the user just wants to undo fiddling, `reset` returns every writable control
 to its default in one shot.
 
+### Exposure recipes (verified on the Tiny 2)
+
+**Dark snapshots? Check `auto_exposure` first.** On this camera the menu is
+UVC-standard: `1` = manual, `3` = aperture-priority auto. A camera left in
+manual (`1`) with a small `exposure_time_absolute` (e.g. 50) produces
+near-black frames that look like a sleeping or broken camera.
+
+**Auto exposure does not rescue one-shot snapshots.** AE converges over a
+running stream, but `snapshot` opens the stream, grabs a frame, and closes —
+setting `auto_exposure 3` and immediately snapshotting returns a frame taken
+before AE has adapted (observed: `exposure_time_absolute` still at its old
+value after the shot). For deterministic stills, set exposure manually:
+
+```sh
+# Dark room, known-good starting point:
+rubycam set auto_exposure 1
+rubycam set exposure_time_absolute 1250   # range 1..2500, default 330
+rubycam set gain 60                       # range 1..64
+# Too bright? Halve exposure_time before touching gain (gain adds noise).
+```
+
+Back to normal afterwards: `set auto_exposure 3` for live/streaming use, or
+`reset` to restore every default. Long exposures at high gain are noisy — the
+`rubycam-photo-prep` skill's denoise step covers assessing them.
+
 ## Snapshots
 
 `snapshot` grabs a single JPEG frame. The Tiny 2 shoots up to 4K:
@@ -116,10 +171,15 @@ rubycam snapshot /tmp/shot.jpg --width 3840 --height 2160
 
 Two things to warn the user about: the **first frame after the stream starts
 takes a few seconds** (sensor/ISP warm-up), and a snapshot from a camera in
-privacy sleep is black. If the image comes back dark or frozen, the OBSBOT may
+privacy sleep is black. When a shot matters (or right after waking/moving the
+camera), take a **throwaway snapshot first** and assess the second one. If the image comes back dark or frozen, the OBSBOT may
 be asleep — that's the `rubycam-obsbot` skill's `wake` command. With no path
 argument, `snapshot` writes `snapshot.jpg` in the current directory at
 1920×1080.
+
+Before *you* look at a snapshot (to check framing or exposure), prep it per
+the **`rubycam-photo-prep`** skill — downsize and auto-level a copy rather
+than reading the raw full-size frame.
 
 ## Targeting a specific camera
 
