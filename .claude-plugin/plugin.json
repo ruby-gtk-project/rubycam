@@ -1,0 +1,13 @@
+{
+  "name": "rubycam",
+  "displayName": "Rubycam Camera Control",
+  "version": "0.1.0",
+  "description": "Drive a physical UVC webcam (and OBSBOT Tiny 2 vendor features) through the repo's rubycam CLI: pan/tilt/zoom, image controls, snapshots, plus OBSBOT wake/sleep, AI tracking, presets, HDR and exposure.",
+  "author": {
+    "name": "Nathan Kidd",
+    "email": "nathanblenheimkidd@gmail.com"
+  },
+  "repository": "https://github.com/nathankidd/rubycam-gtk",
+  "license": "MIT",
+  "keywords": ["webcam", "v4l2", "uvc", "obsbot", "camera", "ruby"]
+}

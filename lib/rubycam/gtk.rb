@@ -10,3 +10,4 @@ require "rubycam"
 
 require_relative "gtk/obsbot_panel"
 require_relative "gtk/camera_app"
+require_relative "gtk/video4linux"

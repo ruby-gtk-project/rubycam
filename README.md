@@ -85,6 +85,9 @@ With `rubycam-gtk` installed the viewer is on your PATH:
 rubycam-gtk                    # first camera at /dev/video0
 rubycam-gtk /dev/video2        # explicit device
 rubycam-gtk 'OBSBOT Tiny 2'    # find by name
+
+rubycam-gtk --obsbot           # full OBSBOT viewer (default)
+rubycam-gtk --v4l2             # generic V4L2 viewer, no OBSBOT features
 ```
 
 From a checkout, use the dev shell (it provides the native GTK libs):
@@ -100,6 +103,9 @@ with power switch, live status, AI tracking modes, tracking speed, preset
 positions, HDR, exposure modes and a raw-hex debug console. The ⤢ button
 toggles a compact widget mode (panel only); if the camera disappears the
 app keeps polling and reconnects when it returns.
+
+`--v4l2` launches the same live preview and control sliders without any of
+the OBSBOT panel or vendor commands, so it works with any UVC webcam.
 
 ## CLI
 

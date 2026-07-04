@@ -1,0 +1,14 @@
+{
+  "name": "rubycam",
+  "owner": {
+    "name": "Nathan Kidd",
+    "email": "nathanblenheimkidd@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "rubycam",
+      "source": "./",
+      "description": "Drive a UVC webcam and the OBSBOT Tiny 2's AI features through the rubycam CLI."
+    }
+  ]
+}

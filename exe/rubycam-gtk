@@ -3,10 +3,17 @@
 #
 # Launch the Rubycam GTK viewer.
 #
-#   rubycam-gtk                  # first camera at /dev/video0
+#   rubycam-gtk                  # OBSBOT viewer, first camera at /dev/video0
 #   rubycam-gtk /dev/video2      # explicit device node
 #   rubycam-gtk 'OBSBOT Tiny 2'  # find by card/bus name
+#
+#   rubycam-gtk --obsbot         # full OBSBOT panel (default)
+#   rubycam-gtk --v4l2           # generic V4L2 viewer, no OBSBOT features
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "rubycam/gtk"
 
-Rubycam::GTK::CameraApp.new(ARGV.fetch(0, "/dev/video0")).build.run
+args = ARGV.dup
+mode = args.delete("--v4l2") ? Rubycam::GTK::Video4Linux : nil
+mode = Rubycam::GTK::CameraApp if args.delete("--obsbot") || mode.nil?
+
+mode.new(args.fetch(0, "/dev/video0")).build.run
