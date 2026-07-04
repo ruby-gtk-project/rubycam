@@ -159,6 +159,49 @@ module Rubycam
         end
       end
 
+      # Nod (yes) and shake (no) gimbal gestures. The pan/tilt speed controls
+      # govern how fast absolute moves execute, so the gesture maxes them out
+      # for the duration — a slow drift doesn't read as a nod — and restores
+      # the saved speeds afterwards.
+      class GestureCommand < VideoCommand
+        SWING = 15 * 3600 # amplitude in V4L2 1/3600-degree units
+        BEAT = 0.5        # seconds per half-swing before reversing
+
+        private
+
+        def gesture(options, axis)
+          with_device(options) do |dev|
+            ctrl = fetch_control(dev, axis)
+            speeds = dev.controls.values_at(:pan_speed, :tilt_speed).compact
+            saved = speeds.map { |s| [s, s.value] }
+            begin
+              speeds.each { |s| s.value = s.max }
+              home = ctrl.value
+              2.times do
+                ctrl.value = home + SWING
+                sleep BEAT
+                ctrl.value = home - SWING
+                sleep BEAT
+              end
+              ctrl.value = home
+              sleep BEAT
+            ensure
+              saved.each { |s, v| s.value = v }
+            end
+          end
+        end
+      end
+
+      class Yes < GestureCommand
+        desc 'Nod the camera up and down, like nodding "yes"'
+        def call(**options) = gesture(options, :tilt_absolute)
+      end
+
+      class No < GestureCommand
+        desc 'Pan the camera side to side, like shaking your head "no"'
+        def call(**options) = gesture(options, :pan_absolute)
+      end
+
       class Status < ObsbotCommand
         desc 'Show OBSBOT status (sleep, AI mode, tracking speed, HDR)'
 
@@ -262,6 +305,8 @@ module Rubycam
       register 'set', Set
       register 'reset', Reset
       register 'snapshot', Snapshot
+      register 'yes', Yes
+      register 'no', No
       register 'status', Status
       register 'wake', Wake
       register 'sleep', Sleep
