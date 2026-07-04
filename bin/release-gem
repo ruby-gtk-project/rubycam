@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../lib/rubycam/version"
+
+# rubycam is pushed before rubycam-gtk, because rubycam-gtk depends on the
+# exact same rubycam version and would otherwise be unresolvable on install.
+GEMS = %w[rubycam rubycam-gtk].freeze
+
+version = Rubycam::VERSION
+puts "Local version: #{version}"
+
+GEMS.each do |name|
+  remote = `gem specification #{name} version --remote 2>&1`
+  if $?.success?
+    remote_version = remote[/version: (.+)/, 1]&.strip
+    puts "#{name} remote version: #{remote_version}"
+    if Gem::Version.new(version) <= Gem::Version.new(remote_version)
+      abort "ERROR: #{name} #{version} has not been incremented past remote (#{remote_version})"
+    end
+  else
+    puts "#{name} not yet published remotely, proceeding with first release"
+  end
+end
+
+GEMS.each do |name|
+  gemspec = "#{name}.gemspec"
+  puts "Building #{gemspec}..."
+  system("gem build #{gemspec}") || abort("ERROR: gem build failed for #{name}")
+
+  gem_file = "#{name}-#{version}.gem"
+  puts "Pushing #{gem_file}..."
+  system("gem push #{gem_file}") || abort("ERROR: gem push failed for #{name}")
+
+  puts "Released #{name} #{version}"
+end

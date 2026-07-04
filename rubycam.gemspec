@@ -22,17 +22,17 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1.0"
 
-  spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
-  spec.metadata["documentation_uri"] = spec.homepage
+  spec.metadata["changelog_uri"] = "#{spec.homepage}/releases"
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  # The rubycam gem is the library + CLI: everything except the GTK viewer
-  # (which is the separate rubycam-gtk gem) and dev-only files.
-  spec.files = `git ls-files -z`.split("\x0").reject do |f|
-    f.start_with?("test/", "examples/", "lib/rubycam/gtk") ||
-      f == "exe/rubycam-gtk" ||
-      f.start_with?("rubycam-gtk.gemspec")
+  # The rubycam gem is the library + CLI. The GTK viewer (lib/rubycam/gtk)
+  # is the separate rubycam-gtk gem; dev-only files are left out.
+  spec.files = `git ls-files -z`.split("\x0").select do |f|
+    (f.start_with?("lib/rubycam") && !f.start_with?("lib/rubycam/gtk") && !f.end_with?(".erb")) ||
+      f == "exe/rubycam" ||
+      f == "rubycam.gemspec" ||
+      %w[README.md LICENSE TINY4LINUX_FEATURES.md].include?(f)
   end
   spec.bindir = "exe"
   spec.executables = ["rubycam"]

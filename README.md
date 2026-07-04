@@ -7,6 +7,23 @@ frames come from memory-mapped kernel buffers via Fiddle.
 The OBSBOT is a standard UVC device, so the kernel's `uvcvideo` driver
 already handles it — this library talks V4L2 and works with any UVC webcam.
 
+## Install
+
+Two gems ship from this repo:
+
+| Gem           | Provides                                   | Depends on          |
+| ------------- | ------------------------------------------ | ------------------- |
+| `rubycam`     | the V4L2/OBSBOT library and the `rubycam` CLI | `dry-cli`        |
+| `rubycam-gtk` | the GTK4 viewer and the `rubycam-gtk` app  | `rubycam`, `gtk4`   |
+
+```sh
+gem install rubycam       # library + CLI (pure Ruby, light install)
+gem install rubycam-gtk   # adds the GTK4 viewer (pulls in the GTK stack)
+```
+
+The `rubycam` gem has no dependencies beyond `dry-cli`; the GTK stack only
+comes in with `rubycam-gtk`.
+
 ## Library
 
 ```ruby
@@ -62,13 +79,20 @@ Notes:
 
 ## Viewer app
 
+With `rubycam-gtk` installed the viewer is on your PATH:
+
+```sh
+rubycam-gtk                    # first camera at /dev/video0
+rubycam-gtk /dev/video2        # explicit device
+rubycam-gtk 'OBSBOT Tiny 2'    # find by name
+```
+
+From a checkout, use the dev shell (it provides the native GTK libs):
+
 ```sh
 nix develop            # or let direnv do it (.envrc: use flake)
-bundle install
-bin/rubycam-gtk        # or just `rubycam-gtk` with direnv (bin/ is on PATH)
-
-bin/rubycam-gtk /dev/video2        # explicit device
-bin/rubycam-gtk 'OBSBOT Tiny 2'    # find by name
+bundle install         # or bin/setup
+rubycam-gtk            # exe/ is on PATH via direnv
 ```
 
 Live preview, sliders for gimbal/zoom/image controls, and an OBSBOT panel
@@ -79,27 +103,27 @@ app keeps polling and reconnects when it returns.
 
 ## CLI
 
-Everything the OBSBOT panel does, scriptable (needs only Ruby + the
-`dry-cli` gem, no GTK):
+Everything the OBSBOT panel does, scriptable — shipped by the `rubycam`
+gem (needs only Ruby + the `dry-cli` gem, no GTK):
 
 ```sh
-bin/rubycam                      # list commands
-bin/rubycam status               # sleep state, AI mode, speed, HDR
-bin/rubycam wake                 # wake from privacy sleep
-bin/rubycam track upper_body     # AI tracking mode
-bin/rubycam speed sport
-bin/rubycam preset 2             # gimbal preset 1-3
-bin/rubycam hdr off
-bin/rubycam exposure face
+rubycam                      # list commands
+rubycam status               # sleep state, AI mode, speed, HDR
+rubycam wake                 # wake from privacy sleep
+rubycam track upper_body     # AI tracking mode
+rubycam speed sport
+rubycam preset 2             # gimbal preset 1-3
+rubycam hdr off
+rubycam exposure face
 
-bin/rubycam devices              # every /dev/video* node
-bin/rubycam controls             # V4L2 controls with ranges
-bin/rubycam set zoom_absolute 50
-bin/rubycam reset                # all controls back to defaults
-bin/rubycam snapshot shot.jpg --width=3840 --height=2160
+rubycam devices              # every /dev/video* node
+rubycam controls             # V4L2 controls with ranges
+rubycam set zoom_absolute 50
+rubycam reset                # all controls back to defaults
+rubycam snapshot shot.jpg --width=3840 --height=2160
 
-bin/rubycam xu dump              # debug: status block as hex
-bin/rubycam xu send '16 02 02 00' --selector=0x06
+rubycam xu dump              # debug: status block as hex
+rubycam xu send '16 02 02 00' --selector=0x06
 ```
 
 Generic V4L2 commands default to `/dev/video0`; OBSBOT commands find the
