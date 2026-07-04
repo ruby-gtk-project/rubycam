@@ -10,6 +10,7 @@ GEM
     cairo-gobject (4.3.6)
       cairo (>= 1.16.2)
       glib2 (= 4.3.6)
+    dry-cli (1.4.1)
     fiddle (1.1.8)
     gdk4 (4.3.6)
       cairo-gobject (= 4.3.6)
@@ -53,6 +54,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  dry-cli
   gtk4
 
 BUNDLED WITH

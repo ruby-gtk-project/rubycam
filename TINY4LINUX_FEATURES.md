@@ -43,6 +43,13 @@ Boxes are checked as features land in Rubycam.
       hex-dump 0x06 / 0x02
 - [ ] i18n (7 locales) — skipped: English only, like the rest of Rubycam
 
+## CLI (`t4l` → `bin/rubycamctl`, dry-cli)
+
+- [x] OBSBOT commands: status, wake/sleep, track, speed, preset, hdr, exposure
+- [x] Raw extension-unit access: `xu dump`, `xu send` (with `--debug` logging)
+- [x] V4L2 commands (any UVC camera): devices, info, controls, get/set/reset
+- [x] Snapshot to JPEG with format negotiation
+
 ## Rubycam extras (not in Tiny4Linux)
 
 - Live video preview (pure-Ruby V4L2 MJPG streaming)
@@ -51,7 +58,6 @@ Boxes are checked as features land in Rubycam.
 
 ## Out of scope
 
-- CLI (`t4l`) — user asked for GUI + library only
 - AUR packaging / desktop files / OBSBOT theme assets
 
 ## Firmware notes (verified on real hardware, 2026-07)
